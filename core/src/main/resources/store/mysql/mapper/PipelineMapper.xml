@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthor.core.pipeline.store.mysql.PipelineMapper">
+
+    <sql id="fields" >
+        id,
+        job_name AS jobName,
+        type,
+        status
+    </sql>
+
+    <insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
+            parameterType="com.arthor.core.pipeline.store.PipelineDO" >
+        INSERT INTO t_pipeline
+        VALUES (NULL, #{jobName}, #{type}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.arthor.core.pipeline.store.PipelineDO">
+        UPDATE t_pipeline
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <select id="list" parameterType="com.arthor.core.pipeline.model.ListPipelineRequest"
+            resultType="com.arthor.core.pipeline.store.PipelineDO" >
+        SELECT
+        <include refid="fields" />
+        FROM t_pipeline
+        <where>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" parameterType="java.lang.Long"
+            resultType="com.arthor.core.pipeline.store.PipelineDO">
+        SELECT
+        <include refid="fields" />
+        FROM t_pipeline
+        where id = #{id}
+    </select>
+
+</mapper>

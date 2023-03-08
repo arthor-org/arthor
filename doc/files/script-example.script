@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+        stages {
+            stage('clone repo') {
+                steps{
+                    sshagent (credentials: ["github"]) {
+                        git url: '${repository_url}', branch: '${branch}'
+                    }
+                    script {
+                        commit_id = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                        image_repository_host='xxx'
+                        image_repository_org='xxx'
+                        image_repository_username='xxx'
+                        image_repository_password='xxx'
+                        job_name='user'
+                        environment="""${environment}"""
+                        image_id="""${image_repository_host}/${image_repository_org}/${job_name}:${commit_id}"""
+                        buildDescription """${image_id}"""
+                    }
+                }
+            }
+        stage('complie') {
+            steps{
+                dir('user-server') {
+                    sh 'mvn clean package'
+                }
+            }
+        }
+        stage('build image') {
+            steps{
+                dir('user-server/target') {
+                    sh """docker build -t ${image_id} -f ../Dockerfile-${environment} ."""
+                    sh """docker login -u ${image_repository_username} -p ${image_repository_password} ${image_repository_host}"""
+                    sh """docker push ${image_id}"""
+                    sh """docker rmi ${image_id}"""
+                }
+            }
+        }
+    }
+}

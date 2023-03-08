@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthor.core.deploy.store.mysql.DeploymentMapper">
+
+    <sql id="fields" >
+        id,
+        application_id AS applicationId,
+        application_name AS applicationName,
+        feature_id AS featureId,
+        build_record_id AS buildRecordId,
+        env AS env,
+        namespace AS namespace,
+        host AS host,
+        deployment_name AS deploymentName,
+        deployment_image_id AS deploymentImageId,
+        deployment_image_pull_policy AS deploymentImagePullPolicy,
+        deployment_replicas AS deploymentReplicas,
+        deployment_updated_replicas AS deploymentUpdatedReplicas,
+        deployment_ready_replicas AS deploymentReadyReplicas,
+        deployment_available_replicas AS deploymentAvailableReplicas,
+        deployment_unavailable_replicas AS deploymentUnavailableReplicas,
+        deployment_pod_label_name AS deploymentPodLabelName,
+        deployment_container_name AS deploymentContainerName,
+        deployment_container_port AS deploymentContainerPort,
+        deployment_ext AS deploymentExt,
+        pods AS pods,
+        deployment_status AS deploymentStatus,
+        deploy_mode AS deployMode,
+        service_name AS serviceName,
+        service_ext AS serviceExt,
+        service_status AS serviceStatus,
+        route_name AS routeName,
+        route_path AS routePath,
+        route_ext AS routeExt,
+        route_status AS routeStatus,
+        related_deployment_id AS relatedDeploymentId,
+        canary AS canary,
+        canary_type AS canaryType,
+        canary_value AS canaryValue,
+        symbol AS symbol,
+        tick AS tick,
+        external AS external,
+        lifecycle AS lifecycle,
+        shutdown_time AS shutdownTime,
+        status AS status,
+        create_time AS createTime,
+        finish_time AS finishTime
+    </sql>
+
+    <select id="findById" parameterType="java.lang.Long"
+            resultType="com.arthor.core.deploy.store.DeploymentDO">
+        SELECT
+        <include refid="fields" />
+        FROM t_deployment
+        where id = #{id}
+    </select>
+
+    <select id="list" parameterType="com.arthor.core.deploy.model.ListDeploymentRequest"
+            resultType="com.arthor.core.deploy.store.DeploymentDO">
+            SELECT
+            <include refid="fields" />
+            FROM t_deployment
+            <where>
+                <if test="tickThreshold != null">
+                    <![CDATA[ AND tick < #{tickThreshold} ]]>
+                </if>
+                <if test="canary != null">
+                    AND canary = #{canary}
+                </if>
+                <if test="symbol != null and symbol != ''">
+                    AND symbol = #{symbol}
+                </if>
+                <if test="buildId != null">
+                    AND build_id = #{buildId}
+                </if>
+                <if test="applicationId != null">
+                    AND application_id = #{applicationId}
+                </if>
+                <if test="statusList != null and statusList.size() > 0">
+                    AND status IN
+                    <foreach collection="statusList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+            ORDER BY create_time DESC
+    </select>
+
+    <insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
+            parameterType="com.arthor.core.deploy.store.DeploymentDO" >
+        INSERT INTO t_deployment
+        VALUES (
+            NULL,
+            #{applicationId},
+            #{applicationName},
+            #{featureId},
+            #{buildRecordId},
+            #{env},
+            #{namespace},
+            #{host},
+            #{deployMode},
+            #{relatedDeploymentId},
+            #{canary},
+            #{symbol},
+            #{tick},
+            #{external},
+            #{status},
+            #{deploymentName},
+            #{deploymentImageId},
+            #{deploymentImagePullPolicy},
+            #{deploymentReplicas},
+            #{deploymentUpdatedReplicas},
+            #{deploymentReadyReplicas},
+            #{deploymentAvailableReplicas},
+            #{deploymentUnavailableReplicas},
+            #{deploymentPodLabelName},
+            #{deploymentContainerName},
+            #{deploymentContainerPort},
+            #{deploymentExt},
+            #{pods},
+            #{deploymentStatus},
+            #{serviceName},
+            #{serviceExt},
+            #{serviceStatus},
+            #{routeName},
+            #{routePath},
+            #{routeExt},
+            #{routeStatus},
+            #{canaryType},
+            #{canaryValue},
+            #{lifecycle},
+            #{shutdownTime},
+            #{createTime},
+            #{finishTime}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.arthor.core.deploy.store.DeploymentDO" >
+        UPDATE t_deployment SET create_time = create_time <!-- 偷个懒 -->
+        <if test="tick != null">
+            , tick = #{tick}
+        </if>
+        <if test="canary != null">
+            , canary = #{canary}
+        </if>
+        <if test="canaryType != null and canaryType != ''">
+            , canary_type = #{canaryType}
+        </if>
+        <if test="canaryValue != null and canaryValue != ''">
+            , canary_value = #{canaryValue}
+        </if>
+        <if test="status != null">
+            , status = #{status}
+        </if>
+        <if test="deploymentStatus != null">
+            , deployment_status = #{deploymentStatus}
+        </if>
+        <if test="serviceStatus != null">
+            , service_status = #{serviceStatus}
+        </if>
+        <if test="routeStatus != null">
+            , route_status = #{routeStatus}
+        </if>
+        <if test="lifecycle != null">
+            , lifecycle = #{lifecycle}
+        </if>
+        <if test="shutdownTime != null">
+            , shutdown_time = #{shutdownTime}
+        </if>
+        <if test="deploymentReadyReplicas != null">
+            , deployment_ready_replicas = #{deploymentReadyReplicas}
+        </if>
+        <if test="deploymentUpdatedReplicas != null">
+            , deployment_updated_replicas = #{deploymentUpdatedReplicas}
+        </if>
+        <if test="deploymentAvailableReplicas != null">
+            , deployment_available_replicas = #{deploymentAvailableReplicas}
+        </if>
+        <if test="deploymentUnavailableReplicas != null">
+            , deployment_unavailable_replicas = #{deploymentUnavailableReplicas}
+        </if>
+        <if test="relatedDeploymentId != null">
+            , related_deployment_id = #{relatedDeploymentId}
+        </if>
+        <if test="pods != null and pods != ''">
+            , pods = #{pods}
+        </if>
+        WHERE id = #{id}
+    </update>
+
+</mapper>

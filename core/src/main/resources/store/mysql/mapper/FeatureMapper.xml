@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthor.core.feature.store.mysql.FeatureMapper">
+
+    <sql id="fields" >
+        id,
+        name,
+        application_name AS applicationName,
+        application_id AS applicationId,
+        repository_type AS repositoryType,
+        repository_url AS repositoryUrl,
+        branch
+    </sql>
+
+    <insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
+            parameterType="com.arthor.core.feature.store.FeatureDO" >
+        INSERT INTO t_feature
+        VALUES (NULL, #{name}, #{applicationName}, #{applicationId}, #{repositoryType}, #{repositoryUrl}, #{branch})
+    </insert>
+
+    <select id="list" parameterType="com.arthor.core.feature.model.ListFeatureRequest"
+            resultType="com.arthor.core.feature.store.FeatureDO" >
+        SELECT
+        <include refid="fields" />
+        FROM t_feature
+        <where>
+            <if test="applicationId != null">
+                AND application_id = #{applicationId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" parameterType="java.lang.Long"
+            resultType="com.arthor.core.feature.store.FeatureDO">
+        SELECT
+        <include refid="fields" />
+        FROM t_feature
+        where id = #{id}
+    </select>
+
+</mapper>

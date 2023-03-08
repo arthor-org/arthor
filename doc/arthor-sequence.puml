@@ -1,0 +1,52 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+研发 -> arthor: 创建应用
+arthor -> jenkins: 创建流水线
+研发负责人 -> 研发: 分配研发任务
+研发 -> 代码仓库: 创建分支
+研发 -> arthor: 创建开发Feature，并指定分支
+研发 -> 研发: coding
+研发 -> 代码仓库: push
+alt DEV流程
+研发 -> arthor: dev环境进行构建
+arthor -> jenkins: 构建
+jenkins -> 代码仓库: 拉取代码
+jenkins -> jenkins: 编译，mvn clean package
+jenkins -> jenkins: 构建镜像，通过环境选择不同的Dockerfile
+jenkins -> harbor: push
+研发 -> arthor: 选择构建记录进行部署，副本，资源，以及部署限定符
+arthor -> Kubernetes: 部署操作「详见下方」
+研发 -> 研发: 自测，联调
+end
+
+alt QA流程
+研发 -> arthor: 发起提测单
+arthor -> QA: 通知对应人员
+QA -> arthor: 发起QA构建
+QA -> arthor: 发起部署
+QA -> QA:测试中
+QA -> arthor: 确认提测单
+end
+
+alt Prod流程
+arthor -> 研发: 通知对应人员
+研发 -> arthor: 上线审核
+研发负责人 -> arthor: 审核通过
+研发 -> arthor: 发起Prod构建
+研发 -> arthor: 发起部署「多为灰度」
+QA -> QA: 线上回归
+QA -> arthor: 同步回归结果
+研发 -> arthor: 蓝绿部署
+研发 -> arthor: 放量。。。
+研发 -> arthor: 全量提升
+研发 -> arthor: 确认本Feature上线完成，web hook
+arthor -> 代码仓库: merge request
+代码仓库 -> arthor: 合并master
+arthor -> 代码仓库: tag
+研发负责人 -> arthor: 确认本次需求上线完成
+end
+
+@enduml

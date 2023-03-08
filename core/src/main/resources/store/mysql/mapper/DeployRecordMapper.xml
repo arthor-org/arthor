@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthor.core.deploy.store.mysql.DeployRecordMapper">
+
+    <sql id="fields" >
+        id,
+        operate,
+        target_id AS targetId,
+        target_snapshot AS targetSnapshot,
+        related_id AS relatedId,
+        related_snapshot AS relatedSnapshot,
+        create_time AS createTime
+    </sql>
+
+    <select id="findById" parameterType="java.lang.Long"
+            resultType="com.arthor.core.deploy.store.DeployRecordDO">
+        SELECT
+        <include refid="fields" />
+        FROM t_deploy_record
+        where id = #{id}
+    </select>
+
+    <insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
+            parameterType="com.arthor.core.deploy.store.DeployRecordDO" >
+        INSERT INTO t_deploy_record
+        VALUES (NULL, #{operate}, #{targetId},
+        #{targetSnapshot}, #{relatedId}, #{relatedSnapshot}, #{createTime})
+    </insert>
+
+
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthor.core.application.store.mysql.ApplicationMapper">
+
+    <sql id="fields" >
+        id,
+        name,
+        description,
+        pipeline_id AS pipelineId
+    </sql>
+
+    <insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
+            parameterType="com.arthor.core.application.store.ApplicationDO" >
+        INSERT INTO t_application
+        VALUES (NULL, #{name}, #{description}, #{pipelineId})
+    </insert>
+
+    <select id="list" parameterType="com.arthor.core.application.model.ListApplicationRequest"
+            resultType="com.arthor.core.application.store.ApplicationDO" >
+        SELECT
+        <include refid="fields" />
+        FROM t_application
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findById" parameterType="java.lang.Long"
+            resultType="com.arthor.core.application.store.ApplicationDO">
+        SELECT
+        <include refid="fields" />
+        FROM t_application
+        where id = #{id}
+    </select>
+
+</mapper>

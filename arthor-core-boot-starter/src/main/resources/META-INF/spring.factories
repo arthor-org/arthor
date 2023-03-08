@@ -1,0 +1,8 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.arthor.core.spring.boot.stater.store.StoreAutoConfiguration,\
+com.arthor.core.spring.boot.stater.service.ServiceAutoConfiguration,\
+com.arthor.core.spring.boot.stater.pipeline.PipelineAutoConfiguration,\
+com.arthor.core.spring.boot.stater.kubernetes.KubernetesAutoConfiguration,\
+com.arthor.core.spring.boot.stater.metadata.MetadataAutoConfiguration,\
+com.arthor.core.spring.boot.stater.command.CommandAutoConfiguration,\
+com.arthor.core.spring.boot.stater.route.RouteAutoConfiguration

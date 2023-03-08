@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthor.core.lock.store.mysql.LockMapper">
+
+    <insert id="save" parameterType="com.arthor.core.lock.store.LockDO" >
+        INSERT INTO t_lock
+        VALUES (#{lockEntry})
+    </insert>
+
+    <delete id="delete" parameterType="com.arthor.core.lock.store.LockDO" >
+        DELETE FROM t_lock
+        WHERE lock_entry = #{lockEntry}
+    </delete>
+
+</mapper>

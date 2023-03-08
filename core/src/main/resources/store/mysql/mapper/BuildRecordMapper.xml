@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arthor.core.build.store.mysql.BuildRecordMapper">
+
+    <sql id="fields" >
+        id,
+        application_id AS applicationId,
+        application_name AS applicationName,
+        feature_id AS featureId,
+        feature_name AS featureName,
+        commit_id AS commitId,
+        image_id AS imageId,
+        build_number AS buildNumber,
+        job_name AS jobName,
+        env_id AS envId,
+        status AS status,
+        number_of_check AS numberOfCheck,
+        create_time AS createTime,
+        finish_time AS finishTime
+    </sql>
+
+    <insert id="save" keyProperty="id" keyColumn="id" useGeneratedKeys="true"
+            parameterType="com.arthor.core.build.store.BuildRecordDO" >
+        INSERT INTO t_build_record
+        VALUES (NULL, #{applicationId}, #{applicationName}, #{featureId}, #{featureName}, #{commitId},
+        #{imageId}, #{buildNumber}, #{jobName}, #{envId}, #{status}, #{numberOfCheck}, #{createTime}, #{finishTime})
+    </insert>
+
+    <select id="list" parameterType="com.arthor.core.build.model.ListBuildRecordRequest"
+            resultType="com.arthor.core.build.store.BuildRecordDO" >
+        SELECT
+        <include refid="fields" />
+        FROM t_build_record
+        <where>
+            <if test="envId != null">
+                AND env_id = #{envId}
+            </if>
+            <if test="featureId != null">
+                AND feature_id = #{featureId}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findById" parameterType="java.lang.Long"
+            resultType="com.arthor.core.build.store.BuildRecordDO">
+        SELECT
+        <include refid="fields" />
+        FROM t_build_record
+        where id = #{id}
+    </select>
+
+    <update id="increaseNumberOfCheck" parameterType="java.lang.Long">
+        <![CDATA[
+            UPDATE t_build_record SET number_of_check = number_of_check + 1
+            WHERE id = #{id}
+            AND number_of_check < 10
+        ]]>
+    </update>
+
+    <update id="update" parameterType="com.arthor.core.build.store.BuildRecordDO" >
+        UPDATE t_build_record SET
+        status = #{status}, commit_id = #{commitId}, image_id = #{imageId}, finish_time = #{finishTime}
+        WHERE id = #{id}
+    </update>
+
+
+</mapper>
